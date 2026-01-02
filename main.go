@@ -53,7 +53,7 @@ func main() {
 		}
 
 		for _, price := range pr {
-			fmt.Printf("P %s %s $%.2f\n", price.Date.Format("2006-01-02"), security, price.AdjClose)
+			fmt.Printf("P %s %s $%.4f\n", price.Date.Format("2006-01-02"), security, price.AdjClose)
 		}
 	}
 }
