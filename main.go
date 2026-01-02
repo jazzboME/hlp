@@ -20,10 +20,10 @@ func main() {
 	var pr []tiingo.EodPrice
 	ctx := context.Background()
 	// get Tiingo Token
-	token := os.Getenv("YOUR_TIINGO_TOKEN")
+	token := os.Getenv("TIINGO_TOKEN")
 
 	if token == "" {
-		fmt.Fprintf(os.Stderr, "No token found. Set YOUR_TIINGO_TOKEN\n")
+		fmt.Fprintf(os.Stderr, "No token found. Set TIINGO_TOKEN\n")
 		os.Exit(1)
 	}
 
