@@ -5,56 +5,55 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"time"
 
 	flag "github.com/spf13/pflag"
 	tiingo "github.com/the-trader-dev/tiin-go"
 )
 
 func main() {
-	// command line flags
-	var tf = flag.StringP("tickerfile", "f", "tickers.hlp", "file which contains tickers to fetch, one line per ticker")
-	var debug = flag.BoolP("debug", "d", false, "writed debugging information to stderr")
-	flag.Parse()
+	var today = time.Now().Truncate(24 * time.Hour)
+	var isoFormat = "2006-01-02"
 
-	// internal variables
+	// command line flags
+	var ticker = flag.StringP("ticker", "t", "", "name of ticker to pull values for")
+	var startDate = flag.TimeP("start", "s", today, []string{isoFormat}, "first date to pull prices for, in YYYY-MM-DD")
+	var endDate = flag.TimeP("end", "e", today, []string{isoFormat}, "last day to pull prices for, in YYYY-MM-DD")
+	flag.Parse()
+	
+	if *ticker == "" {
+		fail("No ticker supplied", nil)
+	}
+
+ 	// internal variables
 	var pr []tiingo.EodPrice
 	ctx := context.Background()
 	// get Tiingo Token
 	token := os.Getenv("TIINGO_TOKEN")
 
 	if token == "" {
-		fmt.Fprintf(os.Stderr, "No token found. Set TIINGO_TOKEN\n")
-		os.Exit(1)
+		fail("No token found, set TIINGO_TOKEN", nil)
 	}
 
-	// read Tickers file
-	tickers, err := readTickers(*tf)
+	c := tiingo.NewClient(token)
+	columns := []string{"date", "adjClose", "divCash", "splitFactor"}
+	resp, err := c.EodPrice(ctx, *ticker, *startDate, *endDate, tiingo.Daily, tiingo.DateAsc, tiingo.JSON, columns)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to read tickerfile: %s\n", err)
-		os.Exit(1)
-	}
-
-	if *debug {
-		fmt.Fprintf(os.Stderr, "%s\n", tickers)
+		fail("failed to get prices", err)
 	}
 	
-	c := tiingo.NewClient(token)
+	err = json.Unmarshal(resp, &pr)
+	if err != nil {
+		fail("failed to unmarshal results", err)
+	}
 
-	for _, security := range tickers {
-		resp, err := c.DefaultEodPrice(ctx, security)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%s: %s\n", security, err)
-			continue
-		}
-		err = json.Unmarshal(resp, &pr)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%s: %s\n", security, err)
-			continue
-		}
-
-		for _, price := range pr {
-			fmt.Printf("P %s %s $%.5f\n", price.Date.Format("2006-01-02"), security, price.AdjClose)
-		}
+	for _, price := range pr {
+		fmt.Printf("P %s %s %.8f USD\n", price.Date.Format(isoFormat), *ticker, price.AdjClose)
 	}
 }
 
+func fail(reason string, err error) {
+	if err != nil { reason = reason + ":"}
+	fmt.Fprintf(os.Stderr, "%s %v", reason, err)
+	os.Exit(1)
+}
