@@ -48,12 +48,19 @@ func main() {
 	}
 
 	for _, price := range pr {
-		fmt.Printf("P %s %s %.8f USD\n", price.Date.Format(isoFormat), *ticker, price.AdjClose)
+		fmt.Println(price)
+		var cmt string
+		if price.DivCash > 0 { cmt += fmt.Sprintf(" Ex-dividend of %f.", price.DivCash) }
+		if price.SplitFactor != 1.0 { cmt += fmt.Sprintf(" Split at %.2f ratio.", price.SplitFactor) }
+		if len(cmt) > 0 {
+			cmt = " ;" + cmt
+		}
+		fmt.Printf("P %s %s %.8f USD%s\n", price.Date.Format(isoFormat), *ticker, price.AdjClose, cmt)
 	}
 }
 
 func fail(reason string, err error) {
-	if err != nil { reason = reason + ":"}
-	fmt.Fprintf(os.Stderr, "%s %v", reason, err)
+	if err != nil { reason = reason + fmt.Sprintf(": %v", err) }
+	fmt.Fprintf(os.Stderr, "%s\n", reason)
 	os.Exit(1)
 }
