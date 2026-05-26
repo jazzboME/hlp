@@ -90,35 +90,6 @@ func main() {
 			}
 		}
 	}
-		//err = json.Unmarshal(resp, &pr)
-		//if err != nil {
-		//	fail("failed to unmarshal securities, err")
-		//}
-	
-	/*
-	columns := []string{"date", "adjClose", "divCash", "splitFactor"}
-	resp, err := c.EodPrice(ctx, *ticker, *startDate, *endDate, tiingo.Daily, tiingo.DateAsc, tiingo.JSON, columns)
-	if err != nil {
-		fail("failed to get prices", err)
-	}
-	
-	err = json.Unmarshal(resp, &pr)
-	if err != nil {
-		fail("failed to unmarshal results", err)
-	}
-	*/
-/*
-	for _, price := range resp {
-		fmt.Println(price)
-		var cmt string
-		if price.DivCash > 0 { cmt += fmt.Sprintf(" Ex-dividend of %f.", price.DivCash) }
-		if price.SplitFactor != 1.0 { cmt += fmt.Sprintf(" Split at %.2f ratio.", price.SplitFactor) }
-		if len(cmt) > 0 {
-			cmt = " ;" + cmt
-		}
-		fmt.Printf("P %s %s %.8f USD%s\n", price.Date.Format(isoFormat), *ticker, price.AdjClose, cmt)
-	}
-*/
 }
 
 func fail(reason string, err error) {
