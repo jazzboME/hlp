@@ -36,4 +36,4 @@ else
 
 fi
 ```
-Important note: hlp assumes the base currency is USD, so getprices will fail if that is not true. 
+Important note: hlp assumes the base currency is USD for securities, so getprices will fail if that is not true for your situation.
