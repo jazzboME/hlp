@@ -12,14 +12,14 @@ import (
 	tiingo "github.com/jazzboME/tiin-go"
 )
 
-var markets = []string{ "c", "y", "s" }
+var markets = []string{ "currency", "crypto", "security" }
 
 func main() {
-	var today = time.Now().Truncate(24 * time.Hour)
 	var isoFormat = "2006-01-02"
+	var today = time.Now().Truncate(24 * time.Hour)
 
 	// command line flags
-	var market = flag.StringP("market", "m", "s", "name of market to query, s (security), c (currency) or y (crypto)")
+	var market = flag.StringP("market", "m", "security", "name of market to query, 'security', 'currency' or 'crypto'")
 	var ticker = flag.StringP("ticker", "t", "", "name of ticker to pull values for")
 	var startDate = flag.TimeP("start", "s", today, []string{isoFormat}, "first date to pull prices for, in YYYY-MM-DD")
 	var endDate = flag.TimeP("end", "e", today, []string{isoFormat}, "last day to pull prices for, in YYYY-MM-DD")
@@ -45,7 +45,7 @@ func main() {
 	c := tiingo.NewClient(token)
 
 	switch *market {
-	case "s":
+	case "security":
 		//var pr []tiingo.EodPrice
 		columns := []string{"date", "adjClose", "divCash", "splitFactor"}
 		var e = tiingo.EodPriceParams{
@@ -71,7 +71,7 @@ func main() {
 		}
 		fmt.Printf("P %s %s %.8f USD%s\n", price.Date.Format(isoFormat), *ticker, price.AdjClose, cmt)
 		}
-	case "y":
+	case "crypto":
 		var e = tiingo.CryptoPriceParams{
 			Exchanges: []string{"POLONIEX","GDAX"},
 			StartDate: *startDate,
