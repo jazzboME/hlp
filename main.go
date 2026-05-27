@@ -56,18 +56,16 @@ func main() {
 			RespFormat: tiingo.JSON,
 			Columns: columns,
 		}
-		fmt.Println(e)
 		resp, err := c.EodPrice(ctx, *ticker, &e)
 		if err != nil {
 			fail("failed to get security prices", err)
 		}
 		for _, price := range resp {
-		fmt.Println(price)
-		var cmt string
-		if price.DivCash > 0 { cmt += fmt.Sprintf(" Ex-dividend of %f.", price.DivCash) }
-		if price.SplitFactor != 1.0 { cmt += fmt.Sprintf(" Split at %.2f ratio.", price.SplitFactor) }
-		if len(cmt) > 0 {
-			cmt = " ;" + cmt
+			var cmt string
+			if price.DivCash > 0 { cmt += fmt.Sprintf(" Ex-dividend of %f.", price.DivCash) }
+			if price.SplitFactor != 1.0 { cmt += fmt.Sprintf(" Split at %.2f ratio.", price.SplitFactor) }
+			if len(cmt) > 0 {
+				cmt = " ;" + cmt
 		}
 		fmt.Printf("P %s %s %.8f USD%s\n", price.Date.Format(isoFormat), *ticker, price.AdjClose, cmt)
 		}
